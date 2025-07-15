@@ -63,7 +63,7 @@
       background.appendChild(tick);
     }
 
-    // 初期ポイント
+    // ✅ 正しく保持する変数（100からスタート）
     let totalPoint = 100;
 
     // 実際の値入力欄の表示切替
@@ -91,30 +91,37 @@
       resultText.style.color = "black";
 
       // 音：上昇音再生
-      sfxRise.currentTime = 0;
-      sfxRise.play();
+      try {
+        sfxRise.currentTime = 0;
+        sfxRise.play();
+      } catch (e) { }
 
-      // Step1: 予想値まで
+      // Step1: 予想値までゆっくり（5秒）
       setTimeout(() => {
         meter.style.transition = "width 5s ease-out";
         meter.style.width = guess + "%";
       }, 200);
 
-      // Step2: 実際値へ
+      // Step2: 実測値まで早く（0.7秒）
       setTimeout(() => {
         meter.style.transition = "width 0.7s ease-in";
         meter.style.width = actual + "%";
-        sfxRise.pause();
-        sfxRise.currentTime = 0;
+
+        try {
+          sfxRise.pause();
+          sfxRise.currentTime = 0;
+        } catch (e) { }
       }, 5300);
 
-      // Step3: 結果表示
+      // Step3: 結果表示＆正しく累積減点
       setTimeout(() => {
-        sfxBang.currentTime = 0;
-        sfxBang.play();
+        try {
+          sfxBang.currentTime = 0;
+          sfxBang.play();
+        } catch (e) { }
 
         const diff = Math.abs(guess - actual);
-        totalPoint = Math.max(0, totalPoint - diff);
+        totalPoint = Math.max(0, totalPoint - diff); // ← 累積的に引く
 
         pointDisplay.innerText = `残りポイント：${totalPoint}点`;
 
@@ -123,6 +130,7 @@
           resultText.style.color = "green";
         } else {
           resultText.innerHTML = `誤差：±${diff}%（正解値：${actual}%）`;
+          resultText.style.color = "black";
         }
       }, 6300);
     }
