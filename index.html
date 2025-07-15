@@ -186,10 +186,10 @@
         sfxBang.play();
 
         const diff = Math.abs(guess - actual);
-        const point = Math.max(0, 100 - diff); // 減点処理
-        totalPoint += point;
+        const deduction = Math.min(100, diff); // 最大100点まで減点
+        totalPoint = Math.max(0, totalPoint - deduction); // 減点して0未満にならないよう制限
 
-        pointDisplay.innerText = `累積ポイント：${totalPoint}点`;
+        pointDisplay.innerText = `残りポイント：${totalPoint}点`;
 
         if (diff === 0) {
           resultText.innerHTML = `🎯 パーフェクト！誤差なし（正解値：${actual}%）`;
