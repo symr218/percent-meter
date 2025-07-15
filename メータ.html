@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>パーセントメーター</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+
+    .input-area {
+      margin-bottom: 20px;
+    }
+
+    input[type="number"] {
+      margin: 5px 10px 5px 0;
+      padding: 5px;
+      width: 80px;
+    }
+
+    button {
+      padding: 8px 20px;
+      font-size: 16px;
+    }
+
+    .meter-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      height: 40px;
+      margin-top: 20px;
+    }
+
+    .meter-background {
+      width: 100%;
+      height: 100%;
+      background: #ddd;
+      border-radius: 5px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .meter-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(to right, orange, red);
+      transition: width 5s ease-out;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    .tick {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: #555;
+      opacity: 0.5;
+      z-index: 2;
+    }
+
+    .marker {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: blue;
+      z-index: 3;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>パーセントメーター</h2>
+
+  <div class="input-area">
+    <label>予想値（%）: <input type="number" id="inputGuess" min="0" max="100" value="80"></label>
+
+    <span id="actualContainer">
+      <label>実際の値（%）: <input type="number" id="inputActual" min="0" max="100" value="45"></label>
+    </span>
+
+    <label><input type="checkbox" id="toggleHide"> 実際の値を隠す</label>
+
+    <button onclick="startAnimation()">スタート</button>
+  </div>
+
+  <div class="meter-wrapper">
+    <div class="meter-background" id="meterBackground">
+      <div class="meter-fill" id="meter"></div>
+      <div class="marker" id="marker" style="display: none;"></div>
+    </div>
+  </div>
+
+  <div id="result"></div>
+
+  <audio id="sfxRise" src="https://soundeffect-lab.info/sound/voice/mp3/decision1.mp3" preload="auto"></audio>
+  <audio id="sfxBang" src="https://soundeffect-lab.info/sound/voice/mp3/hit1.mp3" preload="auto"></audio>
+
+  <script>
+    const meter = document.getElementById("meter");
+    const marker = document.getElementById("marker");
+    const background = document.getElementById("meterBackground");
+    const resultText = document.getElementById("result");
+    const toggleHide = document.getElementById("toggleHide");
+    const actualContainer = document.getElementById("actualContainer");
+    const sfxRise = document.getElementById("sfxRise");
+    const sfxBang = document.getElementById("sfxBang");
+
+    // メモリ（10刻み）を描画
+    for (let i = 0; i <= 10; i++) {
+      const tick = document.createElement("div");
+      tick.className = "tick";
+      tick.style.left = (i * 10) + "%";
+      background.appendChild(tick);
+    }
+
+    // 実際の値入力欄の表示切替
+    toggleHide.addEventListener("change", () => {
+      if (toggleHide.checked) {
+        actualContainer.classList.add("hidden");
+      } else {
+        actualContainer.classList.remove("hidden");
+      }
+    });
+
+    function startAnimation() {
+      const guess = parseInt(document.getElementById("inputGuess").value);
+      const actual = parseInt(document.getElementById("inputActual").value);
+
+      if (isNaN(guess) || isNaN(actual) || guess < 0 || guess > 100 || actual < 0 || actual > 100) {
+        alert("0〜100の数値を正しく入力してください。");
+        return;
+      }
+
+      // 初期化
+      meter.style.transition = "none";
+      meter.style.width = "0%";
+      void meter.offsetWidth;
+
+      marker.style.display = "block";
+      marker.style.left = guess + "%";
+      resultText.innerText = "";
+      resultText.style.color = "black";
+
+      // 音：上昇音再生
+      sfxRise.currentTime = 0;
+      sfxRise.play();
+
+      // Step1: 予想値までゆっくり（5秒・ease-outで減速）
+      setTimeout(() => {
+        meter.style.transition = "width 5s ease-out";
+        meter.style.width = guess + "%";
+      }, 200);
+
+      // Step2: 実際値へすばやく（0.7秒）
+      setTimeout(() => {
+        meter.style.transition = "width 0.7s ease-in";
+        meter.style.width = actual + "%";
+        sfxRise.pause();
+        sfxRise.currentTime = 0;
+      }, 5300); // 5秒 + 300ms
+
+      // Step3: 結果表示
+      setTimeout(() => {
+        sfxBang.currentTime = 0;
+        sfxBang.play();
+
+        const diff = Math.abs(guess - actual);
+        if (diff === 0) {
+          resultText.innerText = `🎯 パーフェクト！誤差なし（正解値：${actual}%）`;
+          resultText.style.color = "green";
+        } else {
+          resultText.innerText = `誤差：±${diff}%（正解値：${actual}%）`;
+          resultText.style.color = "black";
+        }
+      }, 6300); // 次の0.7秒 + 300ms
+    }
+  </script>
+
+</body>
+</html>
