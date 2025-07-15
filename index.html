@@ -180,15 +180,16 @@
         sfxBang.play();
 
         const diff = Math.abs(guess - actual);
+        const point = Math.max(0, 100 - diff); // 減点処理（最低0点）
+
         if (diff === 0) {
-          resultText.innerText = `🎯 パーフェクト！誤差なし（正解値：${actual}%）`;
+          resultText.innerHTML = `🎯 パーフェクト！誤差なし（正解値：${actual}%）<br>残りポイント：<strong>${point}</strong>点`;
           resultText.style.color = "green";
         } else {
-          resultText.innerText = `誤差：±${diff}%（正解値：${actual}%）`;
+          resultText.innerHTML = `誤差：±${diff}%（正解値：${actual}%）<br>残りポイント：<strong>${point}</strong>点`;
           resultText.style.color = "black";
         }
-      }, 6300); // 次の0.7秒 + 300ms
-    }
+      }, 6300);
   </script>
 
 </body>
