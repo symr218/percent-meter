@@ -105,7 +105,9 @@
     </div>
   </div>
 
+  <div id="pointDisplay">残りポイント：100点</div>
   <div id="result"></div>
+
 
   <audio id="sfxRise" src="https://soundeffect-lab.info/sound/voice/mp3/decision1.mp3" preload="auto"></audio>
   <audio id="sfxBang" src="https://soundeffect-lab.info/sound/voice/mp3/hit1.mp3" preload="auto"></audio>
@@ -180,13 +182,15 @@
         sfxBang.play();
 
         const diff = Math.abs(guess - actual);
-        const point = Math.max(0, 100 - diff); // 減点処理（最低0点）
+        const point = Math.max(0, 100 - diff); // 減点処理
+
+        pointDisplay.innerText = `残りポイント：${point}点`;
 
         if (diff === 0) {
-          resultText.innerHTML = `🎯 パーフェクト！誤差なし（正解値：${actual}%）<br>残りポイント：<strong>${point}</strong>点`;
+          resultText.innerHTML = `🎯 パーフェクト！誤差なし（正解値：${actual}%）`;
           resultText.style.color = "green";
         } else {
-          resultText.innerHTML = `誤差：±${diff}%（正解値：${actual}%）<br>残りポイント：<strong>${point}</strong>点`;
+          resultText.innerHTML = `誤差：±${diff}%（正解値：${actual}%）`;
           resultText.style.color = "black";
         }
       }, 6300);
