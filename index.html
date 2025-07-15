@@ -121,6 +121,7 @@
     const actualContainer = document.getElementById("actualContainer");
     const sfxRise = document.getElementById("sfxRise");
     const sfxBang = document.getElementById("sfxBang");
+    const pointDisplay = document.getElementById("pointDisplay");
 
     // メモリ（10刻み）を描画
     for (let i = 0; i <= 10; i++) {
@@ -129,6 +130,9 @@
       tick.style.left = (i * 10) + "%";
       background.appendChild(tick);
     }
+
+    // 累積ポイント変数
+    let totalPoint = 0;
 
     // 実際の値入力欄の表示切替
     toggleHide.addEventListener("change", () => {
@@ -174,7 +178,7 @@
         meter.style.width = actual + "%";
         sfxRise.pause();
         sfxRise.currentTime = 0;
-      }, 5300); // 5秒 + 300ms
+      }, 5300);
 
       // Step3: 結果表示
       setTimeout(() => {
@@ -183,8 +187,9 @@
 
         const diff = Math.abs(guess - actual);
         const point = Math.max(0, 100 - diff); // 減点処理
+        totalPoint += point;
 
-        pointDisplay.innerText = `残りポイント：${point}点`;
+        pointDisplay.innerText = `累積ポイント：${totalPoint}点`;
 
         if (diff === 0) {
           resultText.innerHTML = `🎯 パーフェクト！誤差なし（正解値：${actual}%）`;
@@ -196,6 +201,5 @@
       }, 6300);
     }
   </script>
-
 </body>
 </html>
